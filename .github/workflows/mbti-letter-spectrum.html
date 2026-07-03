@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI 字母光谱转换器</title>
+    <style>
+        :root {
+            --bg: #f7f5f2;
+            --card-bg: #ffffff;
+            --text: #2c2416;
+            --subtext: #6b5e4a;
+            --border: #e5ded4;
+            --shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            --e-i: #e07b6c;
+            --s-n: #5b9a8b;
+            --t-f: #c8963e;
+            --j-p: #8b6bae;
+            --e-i-light: #fdf0ed;
+            --s-n-light: #edf6f3;
+            --t-f-light: #fdf7ed;
+            --j-p-light: #f4eff8;
+            --accent: #4a7c6f;
+            --radius: 14px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 20px 0 10px;
+        }
+        .header h1 {
+            font-size: clamp(1.4rem, 3vw, 1.8rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #2c2416;
+            margin-bottom: 6px;
+        }
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: var(--subtext);
+            font-weight: 400;
+        }
+        .header .badge {
+            display: inline-block;
+            background: #f0e8d8;
+            color: #8b6914;
+            font-size: 0.78rem;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: clamp(16px, 3vw, 24px);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: #f0ece6;
+            border-radius: 28px;
+            padding: 4px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--subtext);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            background: #fff;
+            color: #2c2416;
+            font-weight: 600;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+        }
+        .tab-btn:hover:not(.active) {
+            color: #4a3f2f;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Input grid */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .input-group label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #4a3f2f;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .input-group label .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .dot-te {
+            background: #d4866b;
+        }
+        .dot-ti {
+            background: #c46b4f;
+        }
+        .dot-fe {
+            background: #7db8a8;
+        }
+        .dot-fi {
+            background: #5a9e8c;
+        }
+        .dot-se {
+            background: #d4a855;
+        }
+        .dot-si {
+            background: #c8963e;
+        }
+        .dot-ne {
+            background: #9b7ec4;
+        }
+        .dot-ni {
+            background: #7b5ea7;
+        }
+        .input-group input {
+            padding: 10px 12px;
+            border: 1.5px solid #e0d9cd;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: var(--transition);
+            background: #fdfcf9;
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(74, 124, 111, 0.1);
+            background: #fff;
+        }
+        .input-group input::placeholder {
+            color: #c4bdaa;
+        }
+        .input-group .hint {
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        /* Sliders */
+        .slider-group {
+            margin-bottom: 16px;
+        }
+        .slider-group .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .slider-group .slider-header span {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .slider-group .slider-header .val {
+            font-size: 0.8rem;
+            color: var(--subtext);
+            min-width: 55px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-family: 'SF Mono', 'Consolas', 'Menlo', monospace;
+        }
+        .slider-group input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: #e5ded4;
+            outline: none;
+            cursor: pointer;
+        }
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: var(--transition);
+        }
+        .slider-ei input[type="range"] {
+            background: linear-gradient(to right, #f0c4b8, #e5ded4 50%, #b8c8e0 50%, #c4d4f0);
+        }
+        .slider-ei input[type="range"]::-webkit-slider-thumb {
+            background: var(--e-i);
+        }
+        .slider-sn input[type="range"] {
+            background: linear-gradient(to right, #b8d4cc, #e5ded4 50%, #d4c8b0 50%, #e8d8b8);
+        }
+        .slider-sn input[type="range"]::-webkit-slider-thumb {
+            background: var(--s-n);
+        }
+        .slider-tf input[type="range"] {
+            background: linear-gradient(to right, #d4c8b0, #e5ded4 50%, #c8b8d8 50%, #d4c4e8);
+        }
+        .slider-tf input[type="range"]::-webkit-slider-thumb {
+            background: var(--t-f);
+        }
+        .slider-jp input[type="range"] {
+            background: linear-gradient(to right, #c8b8d8, #e5ded4 50%, #d4c8b0 50%, #e8d8b8);
+        }
+        .slider-jp input[type="range"]::-webkit-slider-thumb {
+            background: var(--j-p);
+        }
+
+        /* Result */
+        .result-code {
+            text-align: center;
+            padding: 18px 0 10px;
+        }
+        .result-code .big-code {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            color: #2c2416;
+            font-family: 'SF Mono', 'Consolas', 'Menlo', 'Courier New', monospace;
+            user-select: all;
+            line-height: 1;
+        }
+        .result-code .code-detail {
+            font-size: 0.85rem;
+            color: var(--subtext);
+            margin-top: 4px;
+        }
+        .copy-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 20px;
+            background: #f0e8d8;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #5c4a2e;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .copy-btn:hover {
+            background: #e5d8c0;
+        }
+        .copy-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* SVG container */
+        .axes-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px 0;
+        }
+        .axes-container svg {
+            width: 100%;
+            min-width: 600px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Presets */
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .preset-btn {
+            padding: 7px 14px;
+            border: 1.5px solid #e0d9cd;
+            background: #fdfcf9;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #5c4a2e;
+            transition: var(--transition);
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .preset-btn:hover {
+            background: #f5f0e8;
+            border-color: #c4b898;
+        }
+        .preset-btn:active {
+            background: #ebe4d6;
+            transform: scale(0.97);
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .input-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .input-group input {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+            .tabs {
+                flex-direction: column;
+                gap: 2px;
+                border-radius: 16px;
+            }
+            .tab-btn {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+                border-radius: 14px;
+            }
+            .result-code .big-code {
+                font-size: 2.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🧬 MBTI 字母光谱转换器</h1>
+            <p class="subtitle">将荣格八维或四维倾向转化为独特的字母代码</p>
+            <span class="badge">3150 种精细人格组合</span>
+        </div>
+
+        <!-- Mode Tabs -->
+        <div class="card">
+            <div class="tabs" role="tablist">
+                <button class="tab-btn active" id="tab-eight" role="tab" aria-selected="true">🎯 八维转化模式</button>
+                <button class="tab-btn" id="tab-four" role="tab" aria-selected="false">🎚️ 四维直调模式</button>
+            </div>
+
+            <!-- Eight-dimension input panel -->
+            <div id="panel-eight">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label><span class="dot dot-te"></span> Te 外倾思维</label>
+                        <input type="number" id="te" value="100" placeholder="0-200" min="0" step="0.1">
+                        <span class="hint">目标力</span>
+                    </div>
+                    <div class="input-group">
+                        <label><span class="dot dot-ti"></span> Ti 内倾思维</label>
+                        <input type="number" id="ti" value="155" placeholder="0-200" min="0" step="0.1">
+                        <span class="hint">定义力</span>
+                    </div>
+                    <div class="input-group">
+                        <label><span class="dot dot-fe"></span> Fe 外倾情感</label>
+                        <input type="number" id="fe" value="66" placeholder="0-200" min="0" step="0.1">
+                        <span class="hint">关系力</span>
+                    </div>
+                    <div class="input-group">
+                        <label><span class="dot dot-fi"></span> Fi 内倾情感</label>
+                        <input type="number" id="fi" value="99" placeholder="0-200" min="0" step="0.1">
+                        <span class="hint">信念力</span>
+                    </div>
+                    <div class="input-group">
+                        <label><span class="dot dot-se"></span> Se 外倾感觉</label>
+                        <input type="number" id="se" value="68" placeholder="0-200" min="0" step="0.1">
+                        <span class="hint">体验感</span>
+                    </div>
+                    <div class="input-group">
+                        <label><span class="dot dot-si"></span> Si 内倾感觉</label>
+                        <input type="number" id="si" value="103" placeholder="0-200" min="0" step="0.1">
+                        <span class="hint">印象感</span>
+                    </div>
+                    <div class="input-group">
+                        <label><span class="dot dot-ne"></span> Ne 外倾直觉</label>
+                        <input type="number" id="ne" value="139" placeholder="0-200" min="0" step="0.1">
+                        <span class="hint">展望感</span>
+                    </div>
+                    <div class="input-group">
+                        <label><span class="dot dot-ni"></span> Ni 内倾直觉</label>
+                        <input type="number" id="ni" value="118" placeholder="0-200" min="0" step="0.1">
+                        <span class="hint">预估感</span>
+                    </div>
+                </div>
+                <div class="presets">
+                    <span style="font-size:0.8rem;color:#aaa;line-height:2.2;">预设：</span>
+                    <button class="preset-btn" data-preset="balanced">⚖️ 平衡型</button>
+                    <button class="preset-btn" data-preset="intp">🧠 INTP倾向</button>
+                    <button class="preset-btn" data-preset="esfj">🤝 ESFJ倾向</button>
+                    <button class="preset-btn" data-preset="intj">🎯 INTJ倾向</button>
+                    <button class="preset-btn" data-preset="enfp">🌟 ENFP倾向</button>
+                </div>
+            </div>
+
+            <!-- Four-dimension slider panel -->
+            <div id="panel-four" style="display:none;">
+                <div class="slider-group slider-ei">
+                    <div class="slider-header">
+                        <span style="color:var(--e-i);">🔴 E/I 轴</span>
+                        <span class="val" id="val-ei">0 (G)</span>
+                    </div>
+                    <input type="range" id="slider-ei" min="-50" max="50" value="0" step="0.1">
+                    <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#aaa;padding:0 4px;">
+                        <span>E -50</span><span>G 0</span><span>I +50</span>
+                    </div>
+                </div>
+                <div class="slider-group slider-sn">
+                    <div class="slider-header">
+                        <span style="color:var(--s-n);">🟢 S/N 轴</span>
+                        <span class="val" id="val-sn">0 (Q)</span>
+                    </div>
+                    <input type="range" id="slider-sn" min="-50" max="50" value="0" step="0.1">
+                    <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#aaa;padding:0 4px;">
+                        <span>N -50</span><span>P -10 Q +10</span><span>S +50</span>
+                    </div>
+                </div>
+                <div class="slider-group slider-tf">
+                    <div class="slider-header">
+                        <span style="color:var(--t-f);">🟠 T/F 轴</span>
+                        <span class="val" id="val-tf">0 (M)</span>
+                    </div>
+                    <input type="range" id="slider-tf" min="-50" max="50" value="0" step="0.1">
+                    <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#aaa;padding:0 4px;">
+                        <span>F -50</span><span>M 0</span><span>T +50</span>
+                    </div>
+                </div>
+                <div class="slider-group slider-jp">
+                    <div class="slider-header">
+                        <span style="color:var(--j-p);">🟣 J/P 轴</span>
+                        <span class="val" id="val-jp">0 (M)</span>
+                    </div>
+                    <input type="range" id="slider-jp" min="-50" max="50" value="0" step="0.1">
+                    <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#aaa;padding:0 4px;">
+                        <span>J -50</span><span>M 0</span><span>P +50</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result -->
+        <div class="card" id="result-card">
+            <div class="result-code">
+                <div class="big-code" id="big-code">G P O M</div>
+                <div class="code-detail" id="code-detail">E/I: G | S/N: P | T/F: O | J/P: M</div>
+                <button class="copy-btn" id="copy-btn">📋 复制代码</button>
+                <span id="copy-msg" style="font-size:0.78rem;color:var(--accent);margin-left:8px;display:none;">已复制!</span>
+            </div>
+            <div class="axes-container">
+                <svg viewBox="0 0 750 460" xmlns="http://www.w3.org/2000/svg" id="main-svg">
+                    <!-- Dynamically filled by JS -->
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ============ DOM refs ============
+            const tabEight = document.getElementById('tab-eight');
+            const tabFour = document.getElementById('tab-four');
+            const panelEight = document.getElementById('panel-eight');
+            const panelFour = document.getElementById('panel-four');
+            const bigCodeEl = document.getElementById('big-code');
+            const codeDetailEl = document.getElementById('code-detail');
+            const copyBtn = document.getElementById('copy-btn');
+            const copyMsg = document.getElementById('copy-msg');
+            const svgEl = document.getElementById('main-svg');
+
+            // Eight-dim inputs
+            const inputsEight = {
+                te: document.getElementById('te'),
+                ti: document.getElementById('ti'),
+                fe: document.getElementById('fe'),
+                fi: document.getElementById('fi'),
+                se: document.getElementById('se'),
+                si: document.getElementById('si'),
+                ne: document.getElementById('ne'),
+                ni: document.getElementById('ni'),
+            };
+
+            // Four-dim sliders
+            const sliders = {
+                ei: document.getElementById('slider-ei'),
+                sn: document.getElementById('slider-sn'),
+                tf: document.getElementById('slider-tf'),
+                jp: document.getElementById('slider-jp'),
+            };
+            const sliderVals = {
+                ei: document.getElementById('val-ei'),
+                sn: document.getElementById('val-sn'),
+                tf: document.getElementById('val-tf'),
+                jp: document.getElementById('val-jp'),
+            };
+
+            let currentMode = 'eight'; // 'eight' | 'four'
+            let currentScores = { ei: -6.01, sn: -10.05, tf: 10.71, jp: -4.36 }; // default from example
+            let currentLetters = { ei: 'G', sn: 'P', tf: 'O', jp: 'M' };
+
+            // ============ Axis definitions ============
+            // Each axis: { id, letters[], values[] (corresponding -50..+50), centerLetter (or null), color, label }
+            const axisDefs = [
+                { id: 'ei', letters: ['E', 'F', 'G', 'H', 'I'], values: [-50, -25, 0, 25, 50], centerLetter: 'G',
+                    color: '#e07b6c', label: 'E/I', leftLabel: 'E', rightLabel: 'I' },
+                { id: 'sn', letters: ['N', 'O', 'P', 'Q', 'R', 'S'], values: [-50, -30, -10, 10, 30, 50],
+                    centerLetter: null, color: '#5b9a8b', label: 'S/N', leftLabel: 'N', rightLabel: 'S' },
+                { id: 'tf', letters: ['F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'],
+                    values: [-50, -42.857, -35.714, -28.571, -21.429, -14.286, -7.143, 0, 7.143, 14.286, 21.429,
+                        28.571, 35.714, 42.857, 50
+                    ], centerLetter: 'M', color: '#c8963e', label: 'T/F', leftLabel: 'F', rightLabel: 'T' },
+                { id: 'jp', letters: ['J', 'K', 'L', 'M', 'N', 'O', 'P'], values: [-50, -33.333, -16.667, 0, 16.667,
+                        33.333, 50
+                    ], centerLetter: 'M', color: '#8b6bae', label: 'J/P', leftLabel: 'J', rightLabel: 'P' },
+            ];
+
+            // ============ Compute scores from eight dimensions ============
+            function getEightValues() {
+                const vals = {};
+                for (const [key, el] of Object.entries(inputsEight)) {
+                    const v = parseFloat(el.value);
+                    vals[key] = isNaN(v) || v < 0 ? 0 : v;
+                }
+                return vals;
+            }
+
+            function computeScoresFromEight(vals) {
+                const T = vals.te + vals.ti;
+                const F = vals.fe + vals.fi;
+                const S = vals.se + vals.si;
+                const N = vals.ne + vals.ni;
+                const Egrp = vals.fe + vals.ne + vals.se + vals.te;
+                const Igrp = vals.fi + vals.ni + vals.si + vals.ti;
+                const total = Egrp + Igrp;
+                const Jgrp = vals.fe + vals.te + vals.si + vals.ni;
+                const Pgrp = vals.fi + vals.ti + vals.se + vals.ne;
+
+                const tfScore = (T + F) > 0 ? ((T - F) / (T + F)) * 50 : 0;
+                const snScore = (S + N) > 0 ? ((S - N) / (S + N)) * 50 : 0;
+                const eiScore = total > 0 ? ((Egrp - Igrp) / total) * 50 : 0;
+                const jpScore = total > 0 ? ((Jgrp - Pgrp) / total) * 50 : 0;
+
+                return {
+                    ei: clampScore(eiScore),
+                    sn: clampScore(snScore),
+                    tf: clampScore(tfScore),
+                    jp: clampScore(jpScore),
+                };
+            }
+
+            function clampScore(s) {
+                return Math.max(-50, Math.min(50, s));
+            }
+
+            // ============ Find closest letter on an axis ============
+            function findClosestLetter(score, axisDef) {
+                let bestLetter = axisDef.letters[0];
+                let bestDist = Infinity;
+                for (let i = 0; i < axisDef.letters.length; i++) {
+                    const dist = Math.abs(score - axisDef.values[i]);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestLetter = axisDef.letters[i];
+                    }
+                }
+                return bestLetter;
+            }
+
+            function getLettersFromScores(scores) {
+                return {
+                    ei: findClosestLetter(scores.ei, axisDefs[0]),
+                    sn: findClosestLetter(scores.sn, axisDefs[1]),
+                    tf: findClosestLetter(scores.tf, axisDefs[2]),
+                    jp: findClosestLetter(scores.jp, axisDefs[3]),
+                };
+            }
+
+            function scoreToX(score) {
+                // maps -50..+50 to 75..675 (600px range)
+                return 75 + (score + 50) * 6;
+            }
+
+            // ============ Render SVG ============
+            function renderSVG(scores, letters) {
+                const yPositions = [75, 170, 270, 370]; // y for each axis
+                const svgNS = 'http://www.w3.org/2000/svg';
+                // Clear
+                while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
+
+                // Background subtle grid lines (optional)
+                // Title
+                const titleText = document.createElementNS(svgNS, 'text');
+                titleText.setAttribute('x', '375');
+                titleText.setAttribute('y', '30');
+                titleText.setAttribute('text-anchor', 'middle');
+                titleText.setAttribute('font-size', '14');
+                titleText.setAttribute('font-weight', '600');
+                titleText.setAttribute('fill', '#4a3f2f');
+                titleText.textContent = '四维字母光谱轴';
+                svgEl.appendChild(titleText);
+
+                // Subtitle
+                const subText = document.createElementNS(svgNS, 'text');
+                subText.setAttribute('x', '375');
+                subText.setAttribute('y', '48');
+                subText.setAttribute('text-anchor', 'middle');
+                subText.setAttribute('font-size', '10');
+                subText.setAttribute('fill', '#aaa');
+                subText.textContent = '负数=左端倾向 · 正数=右端倾向 · 奇数轴中心点为0';
+                svgEl.appendChild(subText);
+
+                for (let a = 0; a < axisDefs.length; a++) {
+                    const ax = axisDefs[a];
+                    const y = yPositions[a];
+                    const score = scores[ax.id];
+                    const letter = letters[ax.id];
+                    const xUser = scoreToX(score);
+
+                    // Axis line
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', '65');
+                    line.setAttribute('y1', y);
+                    line.setAttribute('x2', '685');
+                    line.setAttribute('y2', y);
+                    line.setAttribute('stroke', ax.color);
+                    line.setAttribute('stroke-width', '2.5');
+                    line.setAttribute('stroke-linecap', 'round');
+                    line.setAttribute('opacity', '0.7');
+                    svgEl.appendChild(line);
+
+                    // Subtle background band for center region (if center exists)
+                    if (ax.centerLetter) {
+                        const centerIdx = ax.letters.indexOf(ax.centerLetter);
+                        const centerVal = ax.values[centerIdx];
+                        const xCenter = scoreToX(centerVal);
+                        const band = document.createElementNS(svgNS, 'rect');
+                        band.setAttribute('x', xCenter - 15);
+                        band.setAttribute('y', y - 14);
+                        band.setAttribute('width', '30');
+                        band.setAttribute('height', '28');
+                        band.setAttribute('fill', ax.color);
+                        band.setAttribute('opacity', '0.08');
+                        band.setAttribute('rx', '6');
+                        svgEl.appendChild(band);
+                    }
+
+                    // Tick marks & letters
+                    for (let i = 0; i < ax.letters.length; i++) {
+                        const lx = scoreToX(ax.values[i]);
+                        const isCenter = ax.centerLetter && ax.letters[i] === ax.centerLetter;
+                        const isSelected = ax.letters[i] === letter;
+
+                        // Tick
+                        const tick = document.createElementNS(svgNS, 'line');
+                        tick.setAttribute('x1', lx);
+                        tick.setAttribute('y1', y - (isCenter ? 10 : 6));
+                        tick.setAttribute('x2', lx);
+                        tick.setAttribute('y2', y + (isCenter ? 10 : 6));
+                        tick.setAttribute('stroke', ax.color);
+                        tick.setAttribute('stroke-width', isCenter ? 2 : 1);
+                        tick.setAttribute('opacity', isCenter ? 0.9 : 0.5);
+                        svgEl.appendChild(tick);
+
+                        // Dot at tick
+                        const dot = document.createElementNS(svgNS, 'circle');
+                        dot.setAttribute('cx', lx);
+                        dot.setAttribute('cy', y);
+                        dot.setAttribute('r', isSelected ? 6 : (isCenter ? 4.5 : 3));
+                        dot.setAttribute('fill', isSelected ? ax.color : (isCenter ? ax.color : '#ccc'));
+                        dot.setAttribute('stroke', isSelected ? '#fff' : 'none');
+                        dot.setAttribute('stroke-width', isSelected ? '2' : '0');
+                        if (isSelected) {
+                            dot.setAttribute('style', 'filter: drop-shadow(0 0 4px ' + ax.color + ');');
+                        }
+                        svgEl.appendChild(dot);
+
+                        // Letter label - alternate above/below for dense axes
+                        const offsetY = (ax.letters.length >= 10) ? ((i % 2 === 0) ? -18 : 18) : -18;
+                        const fontSize = (ax.letters.length >= 10) ? (isCenter ? 11 : 8.5) : (isCenter ? 12 : 10);
+                        const fontWeight = isSelected ? '700' : (isCenter ? '600' : '400');
+                        const fillColor = isSelected ? ax.color : (isCenter ? '#4a3f2f' : '#888');
+
+                        const lbl = document.createElementNS(svgNS, 'text');
+                        lbl.setAttribute('x', lx);
+                        lbl.setAttribute('y', y + offsetY);
+                        lbl.setAttribute('text-anchor', 'middle');
+                        lbl.setAttribute('font-size', fontSize);
+                        lbl.setAttribute('font-weight', fontWeight);
+                        lbl.setAttribute('fill', fillColor);
+                        lbl.setAttribute('font-family', "'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif");
+                        lbl.textContent = ax.letters[i];
+                        if (isSelected) {
+                            lbl.setAttribute('style', 'filter: drop-shadow(0 0 2px ' + ax.color + ');');
+                        }
+                        svgEl.appendChild(lbl);
+
+                        // Value label below (only for key points on dense axes, or all on sparse)
+                        const showValue = (ax.letters.length <= 7) || isCenter || i === 0 || i === ax.letters
+                            .length - 1;
+                        if (showValue) {
+                            const valStr = ax.values[i] === 0 ? '0' : (Number.isInteger(ax.values[i]) ? ax.values[
+                                i].toString() : ax.values[i].toFixed(1));
+                            const vlbl = document.createElementNS(svgNS, 'text');
+                            vlbl.setAttribute('x', lx);
+                            vlbl.setAttribute('y', y + 30);
+                            vlbl.setAttribute('text-anchor', 'middle');
+                            vlbl.setAttribute('font-size', '8');
+                            vlbl.setAttribute('fill', '#bbb');
+                            vlbl.textContent = valStr;
+                            svgEl.appendChild(vlbl);
+                        }
+                    }
+
+                    // User score marker (large glowing dot)
+                    const userDot = document.createElementNS(svgNS, 'circle');
+                    userDot.setAttribute('cx', xUser);
+                    userDot.setAttribute('cy', y);
+                    userDot.setAttribute('r', '8');
+                    userDot.setAttribute('fill', ax.color);
+                    userDot.setAttribute('stroke', '#fff');
+                    userDot.setAttribute('stroke-width', '3');
+                    userDot.setAttribute('style', 'filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));');
+                    userDot.setAttribute('id', 'user-dot-' + ax.id);
+                    svgEl.appendChild(userDot);
+
+                    // Small label above user dot
+                    const scoreLbl = document.createElementNS(svgNS, 'text');
+                    scoreLbl.setAttribute('x', xUser);
+                    scoreLbl.setAttribute('y', y - 22);
+                    scoreLbl.setAttribute('text-anchor', 'middle');
+                    scoreLbl.setAttribute('font-size', '9');
+                    scoreLbl.setAttribute('font-weight', '700');
+                    scoreLbl.setAttribute('fill', ax.color);
+                    scoreLbl.textContent = score.toFixed(1);
+                    scoreLbl.setAttribute('id', 'score-lbl-' + ax.id);
+                    svgEl.appendChild(scoreLbl);
+
+                    // Axis label on left
+                    const axisLbl = document.createElementNS(svgNS, 'text');
+                    axisLbl.setAttribute('x', '52');
+                    axisLbl.setAttribute('y', y + 4);
+                    axisLbl.setAttribute('text-anchor', 'end');
+                    axisLbl.setAttribute('font-size', '12');
+                    axisLbl.setAttribute('font-weight', '700');
+                    axisLbl.setAttribute('fill', ax.color);
+                    axisLbl.textContent = ax.label;
+                    svgEl.appendChild(axisLbl);
+
+                    // Endpoint labels
+                    const leftEp = document.createElementNS(svgNS, 'text');
+                    leftEp.setAttribute('x', '70');
+                    leftEp.setAttribute('y', y - 26);
+                    leftEp.setAttribute('text-anchor', 'start');
+                    leftEp.setAttribute('font-size', '9');
+                    leftEp.setAttribute('fill', '#bbb');
+                    leftEp.textContent = ax.leftLabel + ' -50';
+                    svgEl.appendChild(leftEp);
+
+                    const rightEp = document.createElementNS(svgNS, 'text');
+                    rightEp.setAttribute('x', '680');
+                    rightEp.setAttribute('y', y - 26);
+                    rightEp.setAttribute('text-anchor', 'end');
+                    rightEp.setAttribute('font-size', '9');
+                    rightEp.setAttribute('fill', '#bbb');
+                    rightEp.textContent = ax.rightLabel + ' +50';
+                    svgEl.appendChild(rightEp);
+                }
+
+                // Legend at bottom
+                const legendY = 435;
+                const legendItems = [
+                    { color: axisDefs[0].color, text: 'E/I轴·红' },
+                    { color: axisDefs[1].color, text: 'S/N轴·绿' },
+                    { color: axisDefs[2].color, text: 'T/F轴·金' },
+                    { color: axisDefs[3].color, text: 'J/P轴·紫' },
+                ];
+                legendItems.forEach((item, i) => {
+                    const cx = 180 + i * 135;
+                    const dot = document.createElementNS(svgNS, 'circle');
+                    dot.setAttribute('cx', cx);
+                    dot.setAttribute('cy', legendY);
+                    dot.setAttribute('r', '5');
+                    dot.setAttribute('fill', item.color);
+                    svgEl.appendChild(dot);
+                    const txt = document.createElementNS(svgNS, 'text');
+                    txt.setAttribute('x', cx + 12);
+                    txt.setAttribute('y', legendY + 4);
+                    txt.setAttribute('font-size', '10');
+                    txt.setAttribute('fill', '#888');
+                    txt.textContent = item.text;
+                    svgEl.appendChild(txt);
+                });
+                const noteTxt = document.createElementNS(svgNS, 'text');
+                noteTxt.setAttribute('x', '375');
+                noteTxt.setAttribute('y', legendY + 20);
+                noteTxt.setAttribute('text-anchor', 'middle');
+                noteTxt.setAttribute('font-size', '9');
+                noteTxt.setAttribute('fill', '#ccc');
+                noteTxt.textContent = '● 大圆点 = 你的精确得分位置  |  高亮字母 = 最终归属';
+                svgEl.appendChild(noteTxt);
+            }
+
+            // ============ Update everything ============
+            function updateAll(scores) {
+                currentScores = scores;
+                currentLetters = getLettersFromScores(scores);
+                const L = currentLetters;
+                const code = L.ei + ' ' + L.sn + ' ' + L.tf + ' ' + L.jp;
+                bigCodeEl.textContent = code;
+                codeDetailEl.textContent =
+                    'E/I: ' + L.ei + ' (' + scores.ei.toFixed(1) + ') | ' +
+                    'S/N: ' + L.sn + ' (' + scores.sn.toFixed(1) + ') | ' +
+                    'T/F: ' + L.tf + ' (' + scores.tf.toFixed(1) + ') | ' +
+                    'J/P: ' + L.jp + ' (' + scores.jp.toFixed(1) + ')';
+                renderSVG(scores, currentLetters);
+
+                // Sync sliders if in four mode
+                if (currentMode === 'four') {
+                    sliders.ei.value = scores.ei;
+                    sliders.sn.value = scores.sn;
+                    sliders.tf.value = scores.tf;
+                    sliders.jp.value = scores.jp;
+                    updateSliderLabels();
+                }
+            }
+
+            function updateFromEight() {
+                const vals = getEightValues();
+                const scores = computeScoresFromEight(vals);
+                updateAll(scores);
+            }
+
+            function updateFromFour() {
+                const scores = {
+                    ei: parseFloat(sliders.ei.value),
+                    sn: parseFloat(sliders.sn.value),
+                    tf: parseFloat(sliders.tf.value),
+                    jp: parseFloat(sliders.jp.value),
+                };
+                updateAll(scores);
+                updateSliderLabels();
+            }
+
+            function updateSliderLabels() {
+                const scores = {
+                    ei: parseFloat(sliders.ei.value),
+                    sn: parseFloat(sliders.sn.value),
+                    tf: parseFloat(sliders.tf.value),
+                    jp: parseFloat(sliders.jp.value),
+                };
+                const letters = getLettersFromScores(scores);
+                sliderVals.ei.textContent = scores.ei.toFixed(1) + ' (' + letters.ei + ')';
+                sliderVals.sn.textContent = scores.sn.toFixed(1) + ' (' + letters.sn + ')';
+                sliderVals.tf.textContent = scores.tf.toFixed(1) + ' (' + letters.tf + ')';
+                sliderVals.jp.textContent = scores.jp.toFixed(1) + ' (' + letters.jp + ')';
+            }
+
+            // ============ Mode switching ============
+            function switchMode(mode) {
+                currentMode = mode;
+                if (mode === 'eight') {
+                    tabEight.classList.add('active');
+                    tabFour.classList.remove('active');
+                    panelEight.style.display = '';
+                    panelFour.style.display = 'none';
+                    tabEight.setAttribute('aria-selected', 'true');
+                    tabFour.setAttribute('aria-selected', 'false');
+                    updateFromEight();
+                } else {
+                    tabFour.classList.add('active');
+                    tabEight.classList.remove('active');
+                    panelFour.style.display = '';
+                    panelEight.style.display = 'none';
+                    tabFour.setAttribute('aria-selected', 'true');
+                    tabEight.setAttribute('aria-selected', 'false');
+                    // Copy current scores to sliders
+                    sliders.ei.value = currentScores.ei;
+                    sliders.sn.value = currentScores.sn;
+                    sliders.tf.value = currentScores.tf;
+                    sliders.jp.value = currentScores.jp;
+                    updateFromFour();
+                }
+            }
+
+            tabEight.addEventListener('click', () => switchMode('eight'));
+            tabFour.addEventListener('click', () => switchMode('four'));
+
+            // ============ Event listeners ============
+            for (const el of Object.values(inputsEight)) {
+                el.addEventListener('input', () => {
+                    if (currentMode === 'eight') updateFromEight();
+                });
+                el.addEventListener('change', () => {
+                    if (currentMode === 'eight') updateFromEight();
+                });
+            }
+            for (const sl of Object.values(sliders)) {
+                sl.addEventListener('input', () => {
+                    if (currentMode === 'four') updateFromFour();
+                });
+            }
+
+            // ============ Presets ============
+            const presets = {
+                'balanced': { te: 80, ti: 80, fe: 80, fi: 80, se: 80, si: 80, ne: 80, ni: 80 },
+                'intp': { te: 40, ti: 160, fe: 30, fi: 70, se: 35, si: 55, ne: 145, ni: 125 },
+                'esfj': { te: 90, ti: 35, fe: 160, fi: 45, se: 80, si: 110, ne: 40, ni: 30 },
+                'intj': { te: 140, ti: 80, fe: 25, fi: 65, se: 30, si: 50, ne: 60, ni: 155 },
+                'enfp': { te: 50, ti: 40, fe: 100, fi: 120, se: 55, si: 25, ne: 160, ni: 70 },
+            };
+
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const presetKey = btn.dataset.preset;
+                    if (presets[presetKey]) {
+                        const p = presets[presetKey];
+                        for (const [key, val] of Object.entries(p)) {
+                            if (inputsEight[key]) inputsEight[key].value = val;
+                        }
+                        if (currentMode === 'eight') {
+                            updateFromEight();
+                        } else {
+                            // Switch to eight mode to show preset
+                            switchMode('eight');
+                        }
+                    }
+                });
+            });
+
+            // ============ Copy button ============
+            copyBtn.addEventListener('click', () => {
+                const code = bigCodeEl.textContent.replace(/\s/g, '');
+                navigator.clipboard.writeText(code).then(() => {
+                    copyMsg.style.display = 'inline';
+                    setTimeout(() => { copyMsg.style.display = 'none'; }, 1800);
+                }).catch(() => {
+                    // Fallback
+                    const ta = document.createElement('textarea');
+                    ta.value = code;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    copyMsg.style.display = 'inline';
+                    setTimeout(() => { copyMsg.style.display = 'none'; }, 1800);
+                });
+            });
+
+            // ============ Keyboard shortcut for copy ============
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'c' && document.activeElement === document.body) {
+                    // Only if user hasn't focused an input
+                    const code = bigCodeEl.textContent.replace(/\s/g, '');
+                    if (code.length === 4) {
+                        navigator.clipboard.writeText(code).then(() => {
+                            copyMsg.style.display = 'inline';
+                            setTimeout(() => { copyMsg.style.display = 'none'; }, 1800);
+                        }).catch(() => {});
+                    }
+                }
+            });
+
+            // ============ Init ============
+            updateFromEight();
+            switchMode('eight');
+        })();
+    </script>
+</body>
+</html>
